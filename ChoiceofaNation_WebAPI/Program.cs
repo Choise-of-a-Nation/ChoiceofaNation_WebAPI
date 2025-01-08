@@ -1,5 +1,7 @@
 using Data;
 using Logic.Entity;
+using Logic.Services;
+using Logic.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChoiceofaNation_WebAPI
@@ -16,6 +18,8 @@ namespace ChoiceofaNation_WebAPI
 
             builder.Services.AddControllers();
 
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
             builder.Services.AddDbContext<Data.DbContext>(x => x.UseNpgsql(connectionString));
 
             builder.Services.AddIdentity<User, Roles>(options =>
@@ -27,6 +31,8 @@ namespace ChoiceofaNation_WebAPI
                 options.Password.RequiredLength = 6;
             })
             .AddEntityFrameworkStores<Data.DbContext>();
+
+            builder.Services.AddScoped<JwtService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
