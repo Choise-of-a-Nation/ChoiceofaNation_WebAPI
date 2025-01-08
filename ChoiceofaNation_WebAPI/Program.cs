@@ -1,3 +1,9 @@
+using Data;
+using Logic.Entity;
+using Logic.Services;
+using Logic.Settings;
+using Microsoft.EntityFrameworkCore;
+
 namespace ChoiceofaNation_WebAPI
 {
     public class Program
@@ -6,9 +12,28 @@ namespace ChoiceofaNation_WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            string connectionString = builder.Configuration.GetConnectionString("postgresSql");
+
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+            builder.Services.AddDbContext<Data.DbContext>(x => x.UseNpgsql(connectionString));
+
+            builder.Services.AddIdentity<User, Roles>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            })
+            .AddEntityFrameworkStores<Data.DbContext>();
+
+            builder.Services.AddScoped<JwtService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -24,6 +49,12 @@ namespace ChoiceofaNation_WebAPI
 
             app.UseHttpsRedirection();
 
+            app.UseCors(options =>
+            {
+                options.WithOrigins("http://localhost:3000");
+            });
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
