@@ -18,5 +18,11 @@ namespace Logic.Services
                 return BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLower();
             }
         }
+
+        public static bool VerifyPassword(string enteredPassword, string storedHash)
+        {
+            string enteredHash = ComputeSHA256Hash(enteredPassword);
+            return enteredHash == storedHash;
+        }
     }
 }

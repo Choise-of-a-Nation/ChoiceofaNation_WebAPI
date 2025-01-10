@@ -3,6 +3,8 @@ using Logic.Entity;
 using Logic.Services;
 using Logic.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ChoiceofaNation_WebAPI
 {
@@ -32,7 +34,26 @@ namespace ChoiceofaNation_WebAPI
             })
             .AddEntityFrameworkStores<Data.DbContext>();
 
+            builder.Services.AddAuthentication("Bearer")
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero, // „асова р≥зниц€ (зазвичай 0)
+                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        builder.Configuration["JwtSettings:SecretKey"]))
+                };
+            });
+
+
             builder.Services.AddScoped<JwtService>();
+            builder.Services.AddSingleton<RefreshTokenService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

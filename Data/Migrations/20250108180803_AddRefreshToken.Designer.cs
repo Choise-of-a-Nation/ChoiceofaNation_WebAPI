@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(DbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250108180803_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,13 +267,13 @@ namespace Data.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "0d979e8e-6eea-4617-a0ad-96264ce65dc6",
+                            ConcurrencyStamp = "11717c80-8421-4304-aee9-b680e5149b3f",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "5c4f1259-9a53-4ee3-ac54-823abf6d87e7",
+                            ConcurrencyStamp = "71655ce4-5442-4203-81d8-3d6d8224b734",
                             Name = "Клієнт"
                         });
                 });
@@ -296,6 +298,10 @@ namespace Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
 
