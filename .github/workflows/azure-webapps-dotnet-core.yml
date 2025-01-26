@@ -42,7 +42,7 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'Your-App-Service-Name' # Замініть на назву вашого Azure App Service
+        app-name: 'Choise-of-a-Nation' # Замініть на назву вашого Azure App Service
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
         package: ./publish
