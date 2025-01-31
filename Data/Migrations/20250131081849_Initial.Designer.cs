@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250108180803_AddRefreshToken")]
-    partial class AddRefreshToken
+    [Migration("20250131081849_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -267,13 +267,13 @@ namespace Data.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "11717c80-8421-4304-aee9-b680e5149b3f",
+                            ConcurrencyStamp = "bad62760-dae8-4d19-8721-d298217807bf",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "71655ce4-5442-4203-81d8-3d6d8224b734",
+                            ConcurrencyStamp = "a547cc61-efe8-44d6-abb4-4569cfd49e2a",
                             Name = "Клієнт"
                         });
                 });
@@ -298,10 +298,6 @@ namespace Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
 

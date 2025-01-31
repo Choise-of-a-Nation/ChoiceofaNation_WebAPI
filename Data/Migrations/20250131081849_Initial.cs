@@ -70,8 +70,9 @@ namespace Data.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     RoleId = table.Column<string>(type: "text", nullable: true),
-                    Token = table.Column<string>(type: "text", nullable: true),
                     Url = table.Column<string>(type: "text", nullable: true),
+                    RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -188,8 +189,8 @@ namespace Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Discriminator", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Client", "d800d423-9ad6-4e6f-880c-180b07ec2792", "Roles", "Клієнт", null },
-                    { "Full", "2893ddcb-bad0-4ae0-890f-f06b0ddf1ba7", "Roles", "Адмін", null }
+                    { "Client", "a547cc61-efe8-44d6-abb4-4569cfd49e2a", "Roles", "Клієнт", null },
+                    { "Full", "bad62760-dae8-4d19-8721-d298217807bf", "Roles", "Адмін", null }
                 });
 
             migrationBuilder.CreateIndex(

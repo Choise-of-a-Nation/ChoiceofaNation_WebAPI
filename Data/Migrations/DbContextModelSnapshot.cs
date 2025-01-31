@@ -265,13 +265,13 @@ namespace Data.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "0d979e8e-6eea-4617-a0ad-96264ce65dc6",
+                            ConcurrencyStamp = "bad62760-dae8-4d19-8721-d298217807bf",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "5c4f1259-9a53-4ee3-ac54-823abf6d87e7",
+                            ConcurrencyStamp = "a547cc61-efe8-44d6-abb4-4569cfd49e2a",
                             Name = "Клієнт"
                         });
                 });
