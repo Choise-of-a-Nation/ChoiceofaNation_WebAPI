@@ -15,6 +15,7 @@ namespace ChoiceofaNation_WebAPI
             var builder = WebApplication.CreateBuilder(args);
 
             string connectionString = builder.Configuration.GetConnectionString("postgresSql");
+            string connectionString1 = builder.Configuration.GetConnectionString("mySql");
 
             // Add services to the container.
 
@@ -22,7 +23,8 @@ namespace ChoiceofaNation_WebAPI
 
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-            builder.Services.AddDbContext<Data.DbContext>(x => x.UseNpgsql(connectionString));
+            //builder.Services.AddDbContext<Data.DbContext>(x => x.UseNpgsql(connectionString));
+            builder.Services.AddDbContext<Data.DbContext>(x => x.UseSqlServer(connectionString1));
 
             builder.Services.AddIdentity<User, Roles>(options =>
             {
