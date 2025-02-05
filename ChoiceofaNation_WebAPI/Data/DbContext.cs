@@ -25,7 +25,7 @@ namespace Data
 
             //optionsBuilder.UseNpgsql(@"Server=localhost:5433;Database=cn_db_1;User ID=postgres;Password=Vladadmin2222");
 
-            optionsBuilder.UseSqlServer("Data Source=SQL6033.site4now.net;Initial Catalog=db_ab26d5_cn1;User Id=db_ab26d5_cn1_admin;Password=Vlad2005;");
+            optionsBuilder.UseSqlServer("Server=tcp:cn-server.database.windows.net,1433;Initial Catalog=cn-db;Persist Security Info=False;User ID=Windbreaker;Password=Vladadmin2222;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
