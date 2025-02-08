@@ -10,7 +10,7 @@ using System;
 
 namespace ChoiceofaNation_WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/register")]
     [ApiController]
     public class RegisterController : ControllerBase
     {
@@ -41,7 +41,8 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 NormalizedUserName = userDTO.Username.Normalize(),
                 Email = userDTO.Email,
                 NormalizedEmail = userDTO.Email.Normalize(),
-                PasswordHash = HasherService.ComputeSHA256Hash(userDTO.Password)
+                PasswordHash = HasherService.ComputeSHA256Hash(userDTO.Password),
+                RoleId = "Client"
             };
 
             var accessToken = _jwtService.GenerateJwtToken(regUser.Email, regUser.Id);

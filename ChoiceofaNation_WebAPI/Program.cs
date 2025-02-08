@@ -5,6 +5,9 @@ using Logic.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 
 namespace ChoiceofaNation_WebAPI
 {
@@ -16,6 +19,8 @@ namespace ChoiceofaNation_WebAPI
 
             string connectionString = builder.Configuration.GetConnectionString("postgresSql");
             string connectionString1 = builder.Configuration.GetConnectionString("mySql");
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
             // Add services to the container.
 
@@ -45,7 +50,7 @@ namespace ChoiceofaNation_WebAPI
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero, // ×àñîâà ð³çíèöÿ (çàçâè÷àé 0)
+                    ClockSkew = TimeSpan.Zero, // Ð§Ð°ÑÐ¾Ð²Ð° Ñ€Ñ–Ð·Ð½Ð¸Ñ†Ñ (Ð·Ð°Ð·Ð²Ð¸Ñ‡Ð°Ð¹ 0)
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -64,19 +69,32 @@ namespace ChoiceofaNation_WebAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    policy => policy.WithOrigins("http://localhost:3000")  // Äîçâîëåíèé äîìåí
+                    policy => policy.AllowAnyOrigin()  
                                     .AllowAnyMethod()
                                     .AllowAnyHeader());
             });
 
             var app = builder.Build();
 
+            app.UseRouting();
+
+            if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) // Ð’Ð¸Ð²Ð¾Ð´Ð¸Ð¼Ð¾ Ð¿Ð¾Ð¼Ð¸Ð»ÐºÐ¸ Ð½Ð°Ð²Ñ–Ñ‚ÑŒ Ñƒ Ð¿Ñ€Ð¾Ð´Ð°ÐºÑˆÐ½
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers(); 
+            });
+
             app.UseCors("AllowSpecificOrigin");
+
+            app.UseSwagger();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
