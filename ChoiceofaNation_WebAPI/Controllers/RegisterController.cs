@@ -145,5 +145,17 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok("Logged out successfully");
         }
 
+        [HttpGet("get-user")]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
     }
 }
