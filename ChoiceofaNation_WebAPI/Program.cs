@@ -50,7 +50,6 @@ namespace ChoiceofaNation_WebAPI
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero, // Часова різниця (зазвичай 0)
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -58,6 +57,7 @@ namespace ChoiceofaNation_WebAPI
                 };
             });
 
+            builder.Services.AddAuthorization();
 
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddSingleton<RefreshTokenService>();
@@ -69,9 +69,10 @@ namespace ChoiceofaNation_WebAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    policy => policy.AllowAnyOrigin()  
+                    policy => policy.WithOrigins("http://localhost:3000", "https://choiseoda-nation-frontend.vercel.app/") 
                                     .AllowAnyMethod()
-                                    .AllowAnyHeader());
+                                    .AllowAnyHeader()
+                                    .AllowCredentials()); 
             });
 
             var app = builder.Build();
@@ -83,12 +84,15 @@ namespace ChoiceofaNation_WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowSpecificOrigin");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers(); 
             });
-
-            app.UseCors("AllowSpecificOrigin");
 
             app.UseSwagger();
 
@@ -104,10 +108,6 @@ namespace ChoiceofaNation_WebAPI
             {
                 options.WithOrigins("http://localhost:3000");
             });
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
 
             app.MapControllers();
 

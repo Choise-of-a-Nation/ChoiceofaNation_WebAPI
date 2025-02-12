@@ -97,7 +97,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7); 
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             await _context.SaveChangesAsync();
 
             return Ok(new
@@ -137,7 +137,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user != null)
             {
-                user.RefreshToken = null; 
+                user.RefreshToken = null;
                 user.RefreshTokenExpiry = null;
                 await _context.SaveChangesAsync();
             }
@@ -145,13 +145,13 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok("Logged out successfully");
         }
 
-        [HttpGet("get-user")]
+        [HttpGet("get-user/{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not found");
             }
 
             return Ok(user);
