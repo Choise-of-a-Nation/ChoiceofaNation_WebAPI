@@ -1,4 +1,5 @@
-﻿using Logic.DTO;
+﻿using ChoiceofaNation_WebAPI.Logic.DTO;
+using Logic.DTO;
 using Logic.Entity;
 using Logic.Services;
 using Logic.Settings;
@@ -156,6 +157,44 @@ namespace ChoiceofaNation_WebAPI.Controllers
 
             return Ok(user);
         }
+
+
+        [HttpPut("update-user/{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDTO model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.UserName = model.Username ?? user.UserName;
+            user.FirstName = model.FirstName ?? user.FirstName;
+            user.LastName = model.LastName ?? user.LastName;
+            user.Email = model.Email ?? user.Email;
+            user.PhoneNumber = model.PhoneNumber ?? user.PhoneNumber;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(user);
+        }
+
+        [HttpPut("change-password/{id}")]
+        public async Task<IActionResult> ChangePassword(string id, [FromBody] ChangePasswordDTO model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.PasswordHash = HasherService.ComputeSHA256Hash(model.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok("Password changed successfully.");
+        }
+
 
     }
 }
