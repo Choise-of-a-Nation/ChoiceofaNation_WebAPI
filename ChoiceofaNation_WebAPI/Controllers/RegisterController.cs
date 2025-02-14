@@ -1,4 +1,5 @@
 ﻿using ChoiceofaNation_WebAPI.Logic.DTO;
+using ChoiceofaNation_WebAPI.Logic.Services;
 using Logic.DTO;
 using Logic.Entity;
 using Logic.Services;
@@ -18,14 +19,17 @@ namespace ChoiceofaNation_WebAPI.Controllers
         private readonly Data.DbContext _context;
         private readonly JwtService _jwtService;
         private readonly RefreshTokenService _refreshTokenService;
+        private readonly BlobService _bloobService;
 
         public RegisterController(Data.DbContext context,
                                   JwtService jwtService,
-                                  RefreshTokenService refreshTokenService)
+                                  RefreshTokenService refreshTokenService,
+                                  BlobService blobService)
         {
             _context = context;
             _jwtService = jwtService;
             _refreshTokenService = refreshTokenService;
+            _bloobService = blobService;
         }
 
         [HttpPost("register")]
@@ -173,6 +177,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
             user.LastName = model.LastName ?? user.LastName;
             user.Email = model.Email ?? user.Email;
             user.PhoneNumber = model.PhoneNumber ?? user.PhoneNumber;
+            user.Url = model.Url ?? user.Url;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
@@ -195,6 +200,21 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok("Password changed successfully.");
         }
 
+        [HttpPost("upload-photo")]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            using var stream = file.OpenReadStream();
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}"; 
+
+            var url = await _bloobService.UploadFileAsync(stream, fileName); 
+
+            return Ok(new { ImageUrl = url });
+        }
 
     }
 }
