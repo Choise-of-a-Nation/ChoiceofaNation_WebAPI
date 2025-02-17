@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChoiceofaNation_WebAPI.Migrations
 {
     [DbContext(typeof(Data.DbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250215082458_AddElementsForForums")]
+    partial class AddElementsForForums
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +27,6 @@ namespace ChoiceofaNation_WebAPI.Migrations
             modelBuilder.Entity("ChoiceofaNation_WebAPI.Logic.Entity.Comment", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -55,7 +56,6 @@ namespace ChoiceofaNation_WebAPI.Migrations
             modelBuilder.Entity("ChoiceofaNation_WebAPI.Logic.Entity.Topic", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -324,13 +324,13 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "79b9694b-0a01-4f7b-97ff-6abddea9e1aa",
+                            ConcurrencyStamp = "0d8bd8d0-97e1-4bf0-8541-c40ac695ed8f",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "11868cd6-4357-449d-b748-2b12cd480ce8",
+                            ConcurrencyStamp = "d26ccaed-0f91-4ed3-9de1-631558def783",
                             Name = "Клієнт"
                         });
                 });

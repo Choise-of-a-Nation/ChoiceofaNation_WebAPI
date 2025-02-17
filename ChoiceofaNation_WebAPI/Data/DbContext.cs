@@ -1,4 +1,5 @@
-﻿using Logic.Entity;
+﻿using ChoiceofaNation_WebAPI.Logic.Entity;
+using Logic.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -36,18 +37,17 @@ namespace Data
                 .HasOne<IdentityUser>()
                 .WithMany()
                 .HasForeignKey(ur => ur.UserId)
-                .OnDelete(DeleteBehavior.NoAction);  // ✅ Виправлення
+                .OnDelete(DeleteBehavior.NoAction);  
 
             modelBuilder.Entity<IdentityUserRole<string>>()
                 .HasOne<IdentityRole>()
                 .WithMany()
                 .HasForeignKey(ur => ur.RoleId)
-                .OnDelete(DeleteBehavior.NoAction);  // ✅ Виправлення
+                .OnDelete(DeleteBehavior.NoAction);  
 
             modelBuilder.Entity<IdentityUserRole<string>>()
                 .HasKey(r => new { r.UserId, r.RoleId });
 
-            // Обмежуємо довжину ключів до 191 символу
             modelBuilder.Entity<IdentityUser>(b =>
             {
                 b.Property(u => u.Id).HasColumnType("VARCHAR(191)");
@@ -64,12 +64,22 @@ namespace Data
                 b.Property(ur => ur.RoleId).HasColumnType("VARCHAR(191)");
             });
 
+            modelBuilder.Entity<Comment>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Topic>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
             modelBuilder.SeedRoles();
         }
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<News> News { get; set; }
         public virtual DbSet<Roles> Roles { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<Topic> Topics { get; set; }
 
     }
 }

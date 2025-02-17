@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ChoiceofaNation_WebAPI.Logic.Entity;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,5 +20,7 @@ namespace Logic.Entity
         public string Url { get; set; }
         public string RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+        public ICollection<Topic> Topics { get; set; } = new HashSet<Topic>();
     }
 }
