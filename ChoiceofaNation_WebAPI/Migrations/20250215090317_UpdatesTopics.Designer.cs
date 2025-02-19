@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChoiceofaNation_WebAPI.Migrations
 {
     [DbContext(typeof(Data.DbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250215090317_UpdatesTopics")]
+    partial class UpdatesTopics
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,10 +62,6 @@ namespace ChoiceofaNation_WebAPI.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -328,13 +326,13 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "7a114c15-6587-4d9e-87cc-7d4ac1721b05",
+                            ConcurrencyStamp = "79b9694b-0a01-4f7b-97ff-6abddea9e1aa",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "743e884f-c9e5-4b34-81bc-883799632eff",
+                            ConcurrencyStamp = "11868cd6-4357-449d-b748-2b12cd480ce8",
                             Name = "Клієнт"
                         });
                 });
@@ -374,7 +372,7 @@ namespace ChoiceofaNation_WebAPI.Migrations
             modelBuilder.Entity("ChoiceofaNation_WebAPI.Logic.Entity.Comment", b =>
                 {
                     b.HasOne("ChoiceofaNation_WebAPI.Logic.Entity.Topic", "Topic")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -461,6 +459,11 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("ChoiceofaNation_WebAPI.Logic.Entity.Topic", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Logic.Entity.Roles", b =>
