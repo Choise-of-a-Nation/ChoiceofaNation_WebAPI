@@ -46,6 +46,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
             {
                 Title = createTopicDTO.Title,
                 UserId = createTopicDTO.UserId,
+                Description = createTopicDTO.Description,
                 CreatedAt = DateTime.UtcNow
             };
 
