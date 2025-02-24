@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChoiceofaNation_WebAPI.Migrations
 {
     [DbContext(typeof(Data.DbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221083225_AddHistoryWiki")]
+    partial class AddHistoryWiki
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,9 +61,6 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -356,13 +355,13 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "acabec11-6c5c-43ef-98fc-cef5bb488db7",
+                            ConcurrencyStamp = "18073129-772d-4935-950a-f305c8cfe2e7",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "ebbfc7f6-a8eb-4b12-87f1-51221b7079fd",
+                            ConcurrencyStamp = "6517751f-8f58-4f2b-b886-f12ced72d3ee",
                             Name = "Клієнт"
                         });
                 });
