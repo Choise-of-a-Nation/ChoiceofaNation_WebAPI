@@ -80,6 +80,7 @@ namespace Data
         public virtual DbSet<Roles> Roles { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Topic> Topics { get; set; }
+        public virtual DbSet<HistoryWiki> HistoryWikis { get; set; }
 
     }
 }
