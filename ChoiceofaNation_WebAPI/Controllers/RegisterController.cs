@@ -50,7 +50,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 RoleId = "Client"
             };
 
-            var accessToken = _jwtService.GenerateJwtToken(regUser.Email, regUser.Id);
+            var accessToken = _jwtService.GenerateJwtToken(regUser.Email, regUser.Id, regUser.RoleId);
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
 
             regUser.RefreshToken = refreshToken;
@@ -98,7 +98,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 return Unauthorized("Invalid credentials");
             }
 
-            var accessToken = _jwtService.GenerateJwtToken(user.Email, user.Id);
+            var accessToken = _jwtService.GenerateJwtToken(user.Email, user.Id, user.RoleId);
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
@@ -121,7 +121,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 return Unauthorized("Invalid or expired refresh token");
             }
 
-            var newAccessToken = _jwtService.GenerateJwtToken(user.Email, user.Id);
+            var newAccessToken = _jwtService.GenerateJwtToken(user.Email, user.Id, user.RoleId);
             var newRefreshToken = _refreshTokenService.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
@@ -214,6 +214,22 @@ namespace ChoiceofaNation_WebAPI.Controllers
             var url = await _bloobService.UploadFileAsync(stream, fileName); 
 
             return Ok(new { ImageUrl = url });
+        }
+
+
+        [HttpDelete("delete-user/{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Користувача не знайдено");
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Користувач {user.UserName} видалений");
         }
 
     }

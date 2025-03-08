@@ -53,5 +53,20 @@ namespace ChoiceofaNation_WebAPI.Controllers
 
             return Ok();
         }
+
+        [HttpDelete("delete-history/{id}")]
+        public async Task<IActionResult> DeleteHist(string id)
+        {
+            var hist = await _context.HistoryWikis.FindAsync(id);
+            if (hist == null)
+            {
+                return NotFound("Довідку не знайдено");
+            }
+
+            _context.HistoryWikis.Remove(hist);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Довідка {hist.Title} видалений");
+        }
     }
 }

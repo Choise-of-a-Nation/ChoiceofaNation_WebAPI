@@ -20,7 +20,7 @@ namespace Logic.Services
             _jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         }
 
-        public string GenerateJwtToken(string email, string userId)
+        public string GenerateJwtToken(string email, string userId, string roleId)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -28,7 +28,8 @@ namespace Logic.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, email),
-                new Claim("UserId", userId.ToString())
+                new Claim("UserId", userId.ToString()),
+                new Claim("RoleId", roleId.ToString())
             };
 
             var tokenOptions = new JwtSecurityToken(
