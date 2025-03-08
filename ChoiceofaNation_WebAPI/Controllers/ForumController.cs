@@ -89,5 +89,27 @@ namespace ChoiceofaNation_WebAPI.Controllers
 
             return Ok(comments);
         }
+
+        [HttpDelete("delete-topic/{id}")]
+        public async Task<IActionResult> DeleteTopic(string id)
+        {
+            var topic = await _context.Topics.FirstOrDefaultAsync(t => t.Id == id);
+            if (topic == null)
+            {
+                return NotFound("Тему не знайдено");
+            }
+
+            var comments = await _context.Comments
+                             .Where(c => c.TopicId == topic.Id)
+                             .ToListAsync();
+
+            _context.Comments.RemoveRange(comments);
+
+            _context.Topics.Remove(topic);
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Тема та її коментарі успішно видалені");
+        }
     }
 }

@@ -52,5 +52,20 @@ namespace ChoiceofaNation_WebAPI.Controllers
 
             return Ok();
         }
+
+        [HttpDelete("delete-news/{id}")]
+        public async Task<IActionResult> DeleteNews(string id)
+        {
+            var news = await _context.News.FindAsync(id);
+            if (news == null)
+            {
+                return NotFound("Новину не знайдено");
+            }
+
+            _context.News.Remove(news);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Новина {news.Name} видалений");
+        }
     }
 }
