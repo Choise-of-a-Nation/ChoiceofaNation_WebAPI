@@ -1,6 +1,5 @@
 ﻿using ChoiceofaNation_WebAPI.Logic.DTO;
 using ChoiceofaNation_WebAPI.Logic.Entity;
-using ChoiceofaNation_WebAPI.Logic.Services;
 using Logic.Entity;
 using Logic.Services;
 using Microsoft.AspNetCore.Http;
@@ -110,6 +109,22 @@ namespace ChoiceofaNation_WebAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Тема та її коментарі успішно видалені");
+        }
+
+        [HttpDelete("delete-comm/{id}")]
+        public async Task<IActionResult> DeleteComm(string id)
+        {
+            var topic = await _context.Comments.FirstOrDefaultAsync(t => t.Id == id);
+            if (topic == null)
+            {
+                return NotFound("Коментар не знайдено");
+            }
+
+            _context.Comments.Remove(topic);
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Коментар успішно видалені");
         }
     }
 }

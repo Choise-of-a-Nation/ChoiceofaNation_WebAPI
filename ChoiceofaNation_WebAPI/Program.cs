@@ -8,7 +8,6 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
-using ChoiceofaNation_WebAPI.Logic.Services;
 
 namespace ChoiceofaNation_WebAPI
 {
@@ -62,31 +61,14 @@ namespace ChoiceofaNation_WebAPI
 
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddSingleton<RefreshTokenService>();
-            builder.Services.AddSingleton<BlobService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigin",
-                    policy => policy.WithOrigins("http://localhost:3000", "https://choiseoda-nation-frontend.vercel.app/") 
-                                    .AllowAnyMethod()
-                                    .AllowAnyHeader()
-                                    .AllowCredentials()); 
-            });
-
             var app = builder.Build();
 
             app.UseRouting();
-
-            if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) // Виводимо помилки навіть у продакшн
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseCors("AllowSpecificOrigin");
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -105,11 +87,6 @@ namespace ChoiceofaNation_WebAPI
             }
 
             app.UseHttpsRedirection();
-
-            app.UseCors(options =>
-            {
-                options.WithOrigins("http://localhost:3000");
-            });
 
             app.MapControllers();
 

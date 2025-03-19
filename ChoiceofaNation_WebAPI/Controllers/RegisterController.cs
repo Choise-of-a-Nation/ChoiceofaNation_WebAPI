@@ -1,5 +1,4 @@
 ﻿using ChoiceofaNation_WebAPI.Logic.DTO;
-using ChoiceofaNation_WebAPI.Logic.Services;
 using Logic.DTO;
 using Logic.Entity;
 using Logic.Services;
@@ -19,17 +18,14 @@ namespace ChoiceofaNation_WebAPI.Controllers
         private readonly Data.DbContext _context;
         private readonly JwtService _jwtService;
         private readonly RefreshTokenService _refreshTokenService;
-        private readonly BlobService _bloobService;
 
         public RegisterController(Data.DbContext context,
                                   JwtService jwtService,
-                                  RefreshTokenService refreshTokenService,
-                                  BlobService blobService)
+                                  RefreshTokenService refreshTokenService)
         {
             _context = context;
             _jwtService = jwtService;
             _refreshTokenService = refreshTokenService;
-            _bloobService = blobService;
         }
 
         [HttpPost("register")]
@@ -48,6 +44,40 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 NormalizedEmail = userDTO.Email.Normalize(),
                 PasswordHash = HasherService.ComputeSHA256Hash(userDTO.Password),
                 RoleId = "Client"
+            };
+
+            var accessToken = _jwtService.GenerateJwtToken(regUser.Email, regUser.Id, regUser.RoleId);
+            var refreshToken = _refreshTokenService.GenerateRefreshToken();
+
+            regUser.RefreshToken = refreshToken;
+            regUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            _context.Users.Add(regUser);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
+        }
+
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterUserAdmin([FromBody] UserDTOAdmin userDTO)
+        {
+            if (_context.Users.Any(u => u.Email == userDTO.Email))
+            {
+                return BadRequest("User with this email already exists.");
+            }
+
+            var regUser = new User
+            {
+                UserName = userDTO.Username,
+                NormalizedUserName = userDTO.Username.Normalize(),
+                Email = userDTO.Email,
+                NormalizedEmail = userDTO.Email.Normalize(),
+                PasswordHash = HasherService.ComputeSHA256Hash(userDTO.Password),
+                RoleId = userDTO.RoleId
             };
 
             var accessToken = _jwtService.GenerateJwtToken(regUser.Email, regUser.Id, regUser.RoleId);
@@ -185,6 +215,29 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPut("update-user-admin/{id}")]
+        public async Task<IActionResult> UpdateUserAdmin(string id, [FromBody] UpdateUserDTOAdmin model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.UserName = model.Username ?? user.UserName;
+            user.FirstName = model.FirstName ?? user.FirstName;
+            user.LastName = model.LastName ?? user.LastName;
+            user.Email = model.Email ?? user.Email;
+            user.PhoneNumber = model.PhoneNumber ?? user.PhoneNumber;
+            user.Url = model.Url ?? user.Url;
+            user.RoleId = model.RoleId ?? user.RoleId;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(user);
+        }
+
         [HttpPut("change-password/{id}")]
         public async Task<IActionResult> ChangePassword(string id, [FromBody] ChangePasswordDTO model)
         {
@@ -208,12 +261,23 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 return BadRequest("No file uploaded.");
             }
 
-            using var stream = file.OpenReadStream();
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}"; 
+            var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
 
-            var url = await _bloobService.UploadFileAsync(stream, fileName); 
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(uploadPath, fileName);
 
-            return Ok(new { ImageUrl = url });
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+
+            return Ok(new { ImageUrl = fileUrl });
         }
 
 
