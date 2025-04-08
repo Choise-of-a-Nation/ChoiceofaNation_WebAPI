@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Security.Claims;
 
 namespace ChoiceofaNation_WebAPI.Controllers
 {
@@ -97,6 +99,13 @@ namespace ChoiceofaNation_WebAPI.Controllers
             _context.Users.Add(regUser);
             await _context.SaveChangesAsync();
 
+            Response.Cookies.Append("AuthToken", accessToken, new CookieOptions
+            {
+                HttpOnly = true,  
+                Secure = true,    
+                SameSite = SameSiteMode.None
+            });
+
             return Ok(new
             {
                 AccessToken = accessToken,
@@ -142,6 +151,13 @@ namespace ChoiceofaNation_WebAPI.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             await _context.SaveChangesAsync();
+
+            Response.Cookies.Append("AuthToken", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
 
             return Ok(new
             {
@@ -200,6 +216,22 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPost("update-hours")]
+        public async Task<IActionResult> UpdateHours([FromBody] UpdateHoursRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User is not authenticated");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.PlayedHours += request.AddedHours;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { user.PlayedHours });
+        }
 
         [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDTO model)
@@ -367,5 +399,10 @@ namespace ChoiceofaNation_WebAPI.Controllers
             }
         }
 
+    }
+
+    public class UpdateHoursRequest
+    {
+        public int AddedHours { get; set; }
     }
 }
