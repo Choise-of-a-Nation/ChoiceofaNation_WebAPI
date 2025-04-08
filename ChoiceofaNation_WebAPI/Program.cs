@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using Microsoft.Extensions.FileProviders;
 
 namespace ChoiceofaNation_WebAPI
 {
@@ -69,7 +70,7 @@ namespace ChoiceofaNation_WebAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    policy => policy.WithOrigins("http://localhost:3000", "https://choiseoda-nation-frontend.vercel.app/")
+                    policy => policy.WithOrigins("http://localhost:3000", "https://choiseoda-nation-frontend.vercel.app", "https://choise-of-a-nation-game-web.vercel.app")
                                     .AllowAnyMethod()
                                     .AllowAnyHeader()
                                     .AllowCredentials());
@@ -80,6 +81,13 @@ namespace ChoiceofaNation_WebAPI
             app.UseRouting();
 
             app.UseCors("AllowSpecificOrigin");
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
+                    RequestPath = "/uploads"
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();

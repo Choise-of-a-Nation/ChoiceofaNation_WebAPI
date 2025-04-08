@@ -1,4 +1,5 @@
 ﻿using ChoiceofaNation_WebAPI.Logic.DTO;
+using Google.Apis.Auth;
 using Logic.DTO;
 using Logic.Entity;
 using Logic.Services;
@@ -6,8 +7,12 @@ using Logic.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Security.Claims;
 
 namespace ChoiceofaNation_WebAPI.Controllers
 {
@@ -18,14 +23,19 @@ namespace ChoiceofaNation_WebAPI.Controllers
         private readonly Data.DbContext _context;
         private readonly JwtService _jwtService;
         private readonly RefreshTokenService _refreshTokenService;
+        private readonly string _googleClientId;
+        private readonly IConfiguration _configuration;
 
         public RegisterController(Data.DbContext context,
                                   JwtService jwtService,
-                                  RefreshTokenService refreshTokenService)
+                                  RefreshTokenService refreshTokenService,
+                                  IConfiguration configuration)
         {
             _context = context;
             _jwtService = jwtService;
             _refreshTokenService = refreshTokenService;
+            _configuration = configuration;
+            _googleClientId = _configuration["Authentication:Google:ClientId"];
         }
 
         [HttpPost("register")]
@@ -89,6 +99,13 @@ namespace ChoiceofaNation_WebAPI.Controllers
             _context.Users.Add(regUser);
             await _context.SaveChangesAsync();
 
+            Response.Cookies.Append("AuthToken", accessToken, new CookieOptions
+            {
+                HttpOnly = true,  
+                Secure = true,    
+                SameSite = SameSiteMode.None
+            });
+
             return Ok(new
             {
                 AccessToken = accessToken,
@@ -134,6 +151,13 @@ namespace ChoiceofaNation_WebAPI.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             await _context.SaveChangesAsync();
+
+            Response.Cookies.Append("AuthToken", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
 
             return Ok(new
             {
@@ -192,6 +216,22 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPost("update-hours")]
+        public async Task<IActionResult> UpdateHours([FromBody] UpdateHoursRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User is not authenticated");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.PlayedHours += request.AddedHours;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { user.PlayedHours });
+        }
 
         [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDTO model)
@@ -261,7 +301,8 @@ namespace ChoiceofaNation_WebAPI.Controllers
                 return BadRequest("No file uploaded.");
             }
 
-            var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            var uploadPath = Path.Combine("wwwroot", "uploads");
+
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
@@ -296,5 +337,72 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok($"Користувач {user.UserName} видалений");
         }
 
+        public class GoogleLoginRequest
+        {
+            public string Credential { get; set; }
+        }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            try
+            {
+                // Валідація Google токена
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] { _googleClientId }
+                };
+
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential, settings);
+
+                // Пошук користувача в базі даних
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+                if (user == null)
+                {
+                    // Створення нового користувача, якщо він не існує
+                    user = new User
+                    {
+                        Email = payload.Email,
+                        NormalizedEmail = payload.Email.Normalize(),
+                        UserName = payload.Name,
+                        NormalizedUserName = payload.Name.Normalize(),
+                        Url = payload.Picture,
+                        RoleId = "Client"
+                    };
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+
+                // Генерація JWT токенів
+                var accessToken = _jwtService.GenerateJwtToken(user.Email, user.Id, user.RoleId);
+                var refreshToken = _refreshTokenService.GenerateRefreshToken();
+
+                // Зберігання refresh токена
+                user.RefreshToken = refreshToken;
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return BadRequest(new { message = "Недійсний Google токен" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Внутрішня помилка сервера", error = ex.Message });
+            }
+        }
+
+    }
+
+    public class UpdateHoursRequest
+    {
+        public int AddedHours { get; set; }
     }
 }
