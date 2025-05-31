@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChoiceofaNation_WebAPI.Migrations
 {
     [DbContext(typeof(Data.DbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250526065208_AddAchivments")]
+    partial class AddAchivments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,15 +40,15 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IconUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameEng")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -398,13 +400,13 @@ namespace ChoiceofaNation_WebAPI.Migrations
                         new
                         {
                             Id = "Full",
-                            ConcurrencyStamp = "125d94d2-57e9-455f-9c42-e31c9c916168",
+                            ConcurrencyStamp = "d95a8168-a1cc-41ce-b95d-732b933314dd",
                             Name = "Адмін"
                         },
                         new
                         {
                             Id = "Client",
-                            ConcurrencyStamp = "cff6589c-ff49-481d-a1ba-e47dca342d79",
+                            ConcurrencyStamp = "8f6ec812-8f82-454d-b20e-109c026de800",
                             Name = "Клієнт"
                         });
                 });

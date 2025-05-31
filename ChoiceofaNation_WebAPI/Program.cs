@@ -86,7 +86,7 @@ namespace ChoiceofaNation_WebAPI
             {
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
-                    RequestPath = "/uploads"
+                RequestPath = "/uploads"
             });
 
             app.UseAuthentication();
