@@ -1,4 +1,5 @@
 ﻿using ChoiceofaNation_WebAPI.Logic.DTO;
+using ChoiceofaNation_WebAPI.Logic.Entity;
 using Google.Apis.Auth;
 using Logic.DTO;
 using Logic.Entity;
@@ -216,21 +217,68 @@ namespace ChoiceofaNation_WebAPI.Controllers
             return Ok(user);
         }
 
-        [HttpPost("update-hours")]
-        public async Task<IActionResult> UpdateHours([FromBody] UpdateHoursRequest request)
+        [HttpPost("update-hours/{id}")]
+        public async Task<IActionResult> UpdateHours(string id, [FromBody] UpdateHoursRequest request)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User is not authenticated");
-
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
             if (user == null)
-                return NotFound("User not found");
+            {
+                return NotFound("User not found.");
+            }
 
             user.PlayedHours += request.AddedHours;
             await _context.SaveChangesAsync();
 
             return Ok(new { user.PlayedHours });
+        }
+
+        [HttpPost("update-achivs/{id}")]
+        public async Task<IActionResult> UpdateAchivs(string id, [FromBody] UpdateAchivsDTO achivsDTO)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            foreach (var item in _context.Achivments)
+            {
+                if(item.Name == achivsDTO.Name)
+                {
+                    return Ok("Achivs received");
+                }
+            }
+
+            user.Achivments.Add(new Achivments()
+            {
+                Name = achivsDTO.Name,
+                NameEng = achivsDTO.NameEng,
+                Description = achivsDTO.Description,
+                DescriptionEng = achivsDTO.DescriptionEng,
+                IconUrl = achivsDTO.IconUrl,
+                isOk = achivsDTO.isOk
+            });
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost("get-achiv-is-ok/{id}")]
+        public async Task<IActionResult> GetAchivIdOk(string id, [FromBody] string achievementName)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var ach = _context.Achivments.FirstOrDefault(a => a.Name == achievementName);
+            if (ach != null)
+            {
+                return Ok(ach.isOk);
+            }
+
+            return Ok("false");
         }
 
         [HttpPut("update-user/{id}")]

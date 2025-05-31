@@ -72,6 +72,10 @@ namespace Data
                 .Property(c => c.Id)
                 .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<Achivments>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
             modelBuilder.SeedRoles();
         }
 
@@ -81,6 +85,7 @@ namespace Data
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Topic> Topics { get; set; }
         public virtual DbSet<HistoryWiki> HistoryWikis { get; set; }
+        public virtual DbSet<Achivments> Achivments { get; set; }
 
     }
 }

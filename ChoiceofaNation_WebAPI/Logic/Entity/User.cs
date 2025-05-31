@@ -21,6 +21,7 @@ namespace Logic.Entity
         public string RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
         public int PlayedHours { get; set; }
+        public ICollection<Achivments> Achivments { get; set; } = new HashSet<Achivments>();
         public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
         public ICollection<Topic> Topics { get; set; } = new HashSet<Topic>();
     }
