@@ -54,7 +54,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
         }
 
         [HttpDelete("delete-news/{id}")]
-        public async Task<IActionResult> DeleteNews(string id)
+        public async Task<IActionResult> DeleteNews(int id)
         {
             var news = await _context.News.FindAsync(id);
             if (news == null)

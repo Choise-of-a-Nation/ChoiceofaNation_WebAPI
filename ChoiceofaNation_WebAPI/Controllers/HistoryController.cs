@@ -55,7 +55,7 @@ namespace ChoiceofaNation_WebAPI.Controllers
         }
 
         [HttpDelete("delete-history/{id}")]
-        public async Task<IActionResult> DeleteHist(string id)
+        public async Task<IActionResult> DeleteHist(int id)
         {
             var hist = await _context.HistoryWikis.FindAsync(id);
             if (hist == null)
